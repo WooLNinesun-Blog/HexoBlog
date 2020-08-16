@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.woolninesun.org","root":"/","scheme":"Gemini","version":"8.0.0-rc.5","exturl":false,"sidebar":{"position":"left","display":"hide","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false};
+  </script>
+
+  <meta name="description" content="[前言]因為這學期課程有很多課都需要用到 python，版本不同且要安裝的也不同，直覺想到的解法就是使用 pyenv + virtualenv 來獨立環境，但是需要用到 jupyter 的話，難道要每個環境都安裝 jupyter 嗎？於是研究了一個晚上，發現可以只用一個 jupyter，然後分別為每個 virtualenv 環境建立 jupyter kernel。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用 pyenv 建立獨立的 Jupyter kernels！">
+<meta property="og:url" content="https://blog.woolninesun.org/posts/7a4db81b/index.html">
+<meta property="og:site_name" content="奈尚羊毛">
+<meta property="og:description" content="[前言]因為這學期課程有很多課都需要用到 python，版本不同且要安裝的也不同，直覺想到的解法就是使用 pyenv + virtualenv 來獨立環境，但是需要用到 jupyter 的話，難道要每個環境都安裝 jupyter 嗎？於是研究了一個晚上，發現可以只用一個 jupyter，然後分別為每個 virtualenv 環境建立 jupyter kernel。">
+<meta property="og:locale">
+<meta property="og:image" content="https://blog.woolninesun.org/uploads/7a4db81b/0001.png">
+<meta property="og:image" content="https://blog.woolninesun.org/uploads/7a4db81b/0002.png">
+<meta property="og:image" content="https://blog.woolninesun.org/uploads/7a4db81b/0003.png">
+<meta property="og:image" content="https://blog.woolninesun.org/uploads/7a4db81b/0004.png">
+<meta property="article:published_time" content="2019-02-26T12:18:03.000Z">
+<meta property="article:modified_time" content="2019-03-17T05:20:00.000Z">
+<meta property="article:author" content="WooLNinesun">
+<meta property="article:tag" content="python">
+<meta property="article:tag" content="jupyter">
+<meta property="article:tag" content="pyenv">
+<meta property="article:tag" content="virtualenv">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.woolninesun.org/uploads/7a4db81b/0001.png">
+
+<link rel="canonical" href="https://blog.woolninesun.org/posts/7a4db81b/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh'
+  };
+</script>
+
+  <title>使用 pyenv 建立獨立的 Jupyter kernels！ | 奈尚羊毛</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <main class="main">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+        <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">奈尚羊毛</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">願如同童話裡的山羊般咀嚼知識</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-首頁">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-文章">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>文章</a>
+
+  </li>
+        <li class="menu-item menu-item-分類">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-關於">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a>
+
+  </li>
+        <li class="menu-item menu-item-留言">
+
+    <a href="/comments/" rel="section"><i class="fa fa-comments fa-fw"></i>留言</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <section class="post-toc-wrap sidebar-panel">
+          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">[前言]</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%AD%A3%E6%96%87"><span class="nav-number">2.</span> <span class="nav-text">[正文]</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%9D-pyenv-and-virtualenv"><span class="nav-number">2.1.</span> <span class="nav-text">安裝 pyenv and virtualenv</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%9D-jupyter-lab"><span class="nav-number">2.2.</span> <span class="nav-text">安裝 jupyter lab</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ModuleNotFoundError-No-module-named-%E2%80%98-ctypes%E2%80%99"><span class="nav-number">2.2.1.</span> <span class="nav-text">ModuleNotFoundError: No module named ‘_ctypes’</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A8%AD%E5%AE%9A%E5%85%B6%E4%BB%96%E7%92%B0%E5%A2%83"><span class="nav-number">2.3.</span> <span class="nav-text">設定其他環境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B0%E5%A2%9E-kernel-%E5%88%B0-jupyterlab"><span class="nav-number">2.4.</span> <span class="nav-text">新增 kernel 到 jupyterlab</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B8%AC%E8%A9%A6%E6%98%AF%E4%B8%8D%E6%98%AF%E7%9C%9F%E7%9A%84%E4%B8%8D%E5%90%8C-kernel"><span class="nav-number">2.5.</span> <span class="nav-text">測試是不是真的不同 kernel</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UPDATE-INFO"><span class="nav-number">2.6.</span> <span class="nav-text">UPDATE INFO</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2019-03-17"><span class="nav-number">2.6.0.1.</span> <span class="nav-text">2019&#x2F;03&#x2F;17</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </section>
+      <!--/noindex-->
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="WooLNinesun"
+      src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">WooLNinesun</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/woolninesun" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;woolninesun" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:WooLNinesun+blog@gmail.com" title="E-Mail → mailto:WooLNinesun+blog@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </section>
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </header>
+
+      
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div id="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+      <div class="main-inner">
+        
+
+        <div class="content post posts-expand">
+          
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh">
+    <link itemprop="mainEntityOfPage" href="https://blog.woolninesun.org/posts/7a4db81b/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="WooLNinesun">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="奈尚羊毛">
+    </span>
+
+    
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用 pyenv 建立獨立的 Jupyter kernels！
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-02-26 20:18:03" itemprop="dateCreated datePublished" datetime="2019-02-26T20:18:03+08:00">2019-02-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2019-03-17 13:20:00" itemprop="dateModified" datetime="2019-03-17T13:20:00+08:00">2019-03-17</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%88%88%E8%B6%A3%E4%BD%BF%E7%84%B6%E7%9A%84%E9%9A%A8%E7%AD%86%E9%9B%9C%E8%AB%87/" itemprop="url" rel="index"><span itemprop="name">興趣使然的隨筆雜談</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="前言"><a href="#前言" class="headerlink" title="[前言]"></a>[前言]</h1><p>因為這學期課程有很多課都需要用到 python，版本不同且要安裝的也不同，直覺想到的解法就是使用 pyenv + virtualenv 來獨立環境，但是需要用到 jupyter 的話，難道要每個環境都安裝 jupyter 嗎？於是研究了一個晚上，發現可以只用一個 jupyter，然後分別為每個 virtualenv 環境建立 jupyter kernel。</p>
+<a id="more"></a>
+
+<h1 id="正文"><a href="#正文" class="headerlink" title="[正文]"></a>[正文]</h1><h2 id="安裝-pyenv-and-virtualenv"><a href="#安裝-pyenv-and-virtualenv" class="headerlink" title="安裝 pyenv and virtualenv"></a>安裝 pyenv and virtualenv</h2><p>基本上按照 <a target="_blank" rel="noopener" href="https://github.com/pyenv/pyenv#basic-github-checkout">pyenv</a> 和 <a target="_blank" rel="noopener" href="https://github.com/pyenv/pyenv-virtualenv#installation">pyenv-virtualenv</a> 的安裝方式做就可以安裝完成，這裡我採用 Basic GitHub Checkout 的方式安裝，因為我想把 pyenv 裝在 <code>~/.local/pyenv</code> 資料夾下面，而不是預設的家目錄下面;</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ mkdir -p ~/.<span class="built_in">local</span>/pyenv</span><br><span class="line"></span><br><span class="line">$ git <span class="built_in">clone</span> https://github.com/pyenv/pyenv.git ~/.<span class="built_in">local</span>/pyenv</span><br><span class="line">Cloning into <span class="string">&#x27;/home/woolninesun/.local/pyenv/&#x27;</span>...</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p><code>git clone</code> 完後編輯 <code>.bashrc</code>，按照官方教學加入 <code>eval &quot;$(pyenv init -)&quot;</code>;</p>
+<div class="note info"><ol>
+<li><code>PYENV_ROOT</code> 是安裝 pyenv 的地方，如果有和咱一樣換地方放 pyenv，記得要改過;</li>
+<li>官方的安裝教學是放在 <code>.bash_profile</code>，不過我習慣把 init 放 <code>.bashrc</code></li>
+</ol>
+</div>
+
+<figure class="highlight bash"><figcaption><span>.bashrc</span></figcaption><table><tr><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="comment"># pyenv</span></span><br><span class="line"><span class="built_in">export</span> PYENV_ROOT=<span class="string">&quot;<span class="variable">$HOME</span>/.local/pyenv&quot;</span></span><br><span class="line"><span class="built_in">export</span> PATH=<span class="string">&quot;<span class="variable">$PYENV_ROOT</span>/bin:<span class="variable">$PATH</span>&quot;</span></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">command</span> -v pyenv 1&gt;/dev/null 2&gt;&amp;1; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">eval</span> <span class="string">&quot;<span class="subst">$(pyenv init -)</span>&quot;</span></span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure>
+
+
+<p>然後重開 shell，<code>pyenv --version</code> 和 <code>pyenv root</code> 之後有出現該出現東西就是安裝成功了;</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ <span class="built_in">exec</span> <span class="string">&quot;<span class="variable">$SHELL</span>&quot;</span></span><br><span class="line"></span><br><span class="line">$ pyenv --version</span><br><span class="line">pyenv 1.2.9-16-g9baa6efe</span><br><span class="line"></span><br><span class="line">$ pyenv root</span><br><span class="line">/home/woolninesun/.<span class="built_in">local</span>/pyenv</span><br></pre></td></tr></table></figure>
+
+<p>接下來安裝 <code>pyenv-virtualenv</code>，<code>git clone</code> 後編輯 <code>.bashrc</code>，在 <code>eval &quot;$(pyenv init -)&quot;</code> 後面加入 <code>eval &quot;$(pyenv virtualenv-init -)&quot;</code>，完成後一樣重開 shell;</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ git <span class="built_in">clone</span> https://github.com/pyenv/pyenv-virtualenv.git $(pyenv root)/plugins/pyenv-virtualenv</span><br><span class="line">Cloning into <span class="string">&#x27;/home/woolninesun/.local/pyenv/plugins/pyenv-virtualenv&#x27;</span>...</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><figcaption><span>.bashrc</span></figcaption><table><tr><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="comment"># pyenv</span></span><br><span class="line"><span class="built_in">export</span> PYENV_ROOT=<span class="string">&quot;<span class="variable">$HOME</span>/.local/pyenv&quot;</span></span><br><span class="line"><span class="built_in">export</span> PATH=<span class="string">&quot;<span class="variable">$PYENV_ROOT</span>/bin:<span class="variable">$PATH</span>&quot;</span></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">command</span> -v pyenv 1&gt;/dev/null 2&gt;&amp;1; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">eval</span> <span class="string">&quot;<span class="subst">$(pyenv init -)</span>&quot;</span></span><br><span class="line">    <span class="built_in">eval</span> <span class="string">&quot;<span class="subst">$(pyenv virtualenv-init -)</span>&quot;</span></span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ <span class="built_in">exec</span> <span class="string">&quot;<span class="variable">$SHELL</span>&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="安裝-jupyter-lab"><a href="#安裝-jupyter-lab" class="headerlink" title="安裝 jupyter lab"></a>安裝 jupyter lab</h2><p>咱我把 jupyterlab 安裝在 jupyterlab 的環境下裡面，主要是希望把 jupyter 也當做一個環境不要汙染到系統上的 python，基本上咱系統的 python 是預設的，平常不會去動到也不會用到。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ pyenv install 3.7.2</span><br><span class="line">Downloading Python-3.7.2.tar.xz...</span><br><span class="line">-&gt; https://www.python.org/ftp/python/3.7.2/Python-3.7.2.tar.xz</span><br><span class="line">Installing Python-3.7.2...</span><br><span class="line">Installed Python-3.7.2 to /home/woolninesun/.<span class="built_in">local</span>/pyenv/versions/3.7.2</span><br><span class="line"></span><br><span class="line">$ pyenv virtualenv 3.7.2 jupyterlab</span><br><span class="line">Looking <span class="keyword">in</span> links: /tmp/tmpkak2tm9a</span><br><span class="line">Requirement already satisfied: ...</span><br><span class="line"></span><br><span class="line">$ pyenv versions</span><br><span class="line">* system (<span class="built_in">set</span> by /home/woolninesun/.<span class="built_in">local</span>/pyenv/version)</span><br><span class="line">  3.7.2</span><br><span class="line">  3.7.2/envs/jupyterlab</span><br><span class="line">  jupyterlab</span><br></pre></td></tr></table></figure>
+
+<div class="note warning"><h3 id="ModuleNotFoundError-No-module-named-‘-ctypes’"><a href="#ModuleNotFoundError-No-module-named-‘-ctypes’" class="headerlink" title="ModuleNotFoundError: No module named ‘_ctypes’"></a>ModuleNotFoundError: No module named ‘_ctypes’</h3><p>如果出現這個錯誤，是因為 python 3.7.2 的 clean install 需要 <code>libffi-dev</code>，安裝一下就好<br>If using RHEL/Fedora: <code>yum install libffi-devel</code><br>If using Debian/Ubuntu: <code>sudo apt-get install libffi-dev</code></p>
+</div>
+
+<p>建立好 jupyterlab 的環境後 <code>activat</code> 起來安裝 <code>jupyterlab</code>，安裝完後產生 jupyter 的設定檔</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ pyenv activate jupyterlab</span><br><span class="line"></span><br><span class="line">(jupyterlab) $ pip install jupyterlab</span><br><span class="line">Collecting jupyterlab</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">(jupyterlab) $ jupyter notebook --generate-config</span><br><span class="line">Writing default config to: /home/woolninesun/.jupyter/jupyter_notebook_config.py</span><br></pre></td></tr></table></figure>
+
+<p>其中咱設定了不要自動開啟瀏覽器，設定 port 和設定資料夾的目錄;</p>
+<figure class="highlight python"><figcaption><span>jupyter_notebook_config.py</span></figcaption><table><tr><td class="code"><pre><span class="line">...</span><br><span class="line">c.NotebookApp.open_browser = <span class="literal">False</span></span><br><span class="line">c.NotebookApp.port = <span class="number">12678</span></span><br><span class="line">c.NotebookApp.notebook_dir = <span class="string">&#x27;/home/woolninesun/Projects&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>設定完後輸入 <code>jupyter lab</code> 開啟，進入網址看看有沒有安裝成功！</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">(jupyterlab) $ jupyter lab</span><br><span class="line">...</span><br><span class="line">    To access the notebook, open this file <span class="keyword">in</span> a browser:</span><br><span class="line">        file:///run/user/1001/jupyter/nbserver-16741-open.html</span><br><span class="line">    Or copy and paste one of these URLs:</span><br><span class="line">        http://localhost:12678/?token=1d3840e3b692dfb554e0b7fe5118ba4dbc1f569e726cf0d5</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p><img src="/uploads/7a4db81b/0001.png"></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">(jupyterlab) $ pyenv deactivate</span><br></pre></td></tr></table></figure>
+
+<h2 id="設定其他環境"><a href="#設定其他環境" class="headerlink" title="設定其他環境"></a>設定其他環境</h2><p>設定一下其他要當 jupyterlab kernel 的環境，由於相當簡單，快速帶過~</p>
+<div class="note warning"><ol>
+<li>要注意的是一定要安裝 <code>ipykernel</code>，否則沒辦法當 jupyter kernel;</li>
+</ol>
+</div>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ pyenv virtualenv 3.7.2 ADL</span><br><span class="line">Looking <span class="keyword">in</span> links: /tmp/tmpkak2tm9a</span><br><span class="line">Requirement already satisfied: ...</span><br><span class="line"></span><br><span class="line">$ pyenv activate ADL </span><br><span class="line"></span><br><span class="line">(ADL) $ pip install ipykernel</span><br><span class="line">Collecting ipykernel</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">(ADL) $ pip install numpy</span><br><span class="line">Collecting numpy</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">(ADL) $ pyenv <span class="built_in">which</span> python</span><br><span class="line">/home/woolninesun/.<span class="built_in">local</span>/pyenv/versions/ADL/bin/python</span><br><span class="line"></span><br><span class="line">(ADL) $ pyenv deactivate</span><br></pre></td></tr></table></figure>
+
+<h2 id="新增-kernel-到-jupyterlab"><a href="#新增-kernel-到-jupyterlab" class="headerlink" title="新增 kernel 到 jupyterlab"></a>新增 kernel 到 jupyterlab</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ pyenv activate jupyterlab</span><br><span class="line"></span><br><span class="line">(jupyterlab) $ jupyter --path</span><br><span class="line">config:</span><br><span class="line">    ...</span><br><span class="line">data:</span><br><span class="line">    /home/woolninesun/.<span class="built_in">local</span>/share/jupyter</span><br><span class="line">    /home/woolninesun/.<span class="built_in">local</span>/pyenv/versions/3.7.2/envs/jupyterlab/share/jupyter</span><br><span class="line">    ...</span><br><span class="line">runtime:</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">(jupyterlab) $ <span class="built_in">cd</span> /home/woolninesun/.<span class="built_in">local</span>/pyenv/versions/3.7.2/envs/jupyterlab/share/jupyter</span><br><span class="line"></span><br><span class="line">(jupyterlab) $ mkdir ADL &amp;&amp; touch ADL/kernel.json</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight json"><figcaption><span>kernel.json</span></figcaption><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">&quot;argv&quot;</span>: [ <span class="string">&quot;/home/woolninesun/.local/pyenv/versions/ADL/bin/python&quot;</span>,</span><br><span class="line">        <span class="string">&quot;-m&quot;</span>, <span class="string">&quot;ipykernel&quot;</span>,</span><br><span class="line">        <span class="string">&quot;-f&quot;</span>, <span class="string">&quot;&#123;connection_file&#125;&quot;</span>],</span><br><span class="line">    <span class="attr">&quot;display_name&quot;</span>: <span class="string">&quot;ADL&quot;</span>,</span><br><span class="line">    <span class="attr">&quot;language&quot;</span>: <span class="string">&quot;python&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<div class="note info"><ol>
+<li><code>/home/woolninesun/.local/pyenv/versions/ADL/bin/python</code> 是前面建立 ADL 時輸入 <code>pyenv which python</code> 得到的;</li>
+<li>只要是 <code>data:</code> 下面的 path 都可以建立 kernel，咱選擇 jupyterlab 環境裡面的路徑;</li>
+<li>如果想設定在 jupyterlab 裡面顯示的 icon，可以將想顯示的 icon 改名成 logo-32x32.png 和 logo-64x64.png 放入同一個資料夾;</li>
+<li>想要瞭解更多，可以參考 <a target="_blank" rel="noopener" href="https://jupyter-client.readthedocs.io/en/latest/kernels.html#kernel-specs">jupyter kernel-specs</a></li>
+</ol>
+</div>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">(jupyterlab) $ jupyter kernelspec list</span><br><span class="line">Available kernels:</span><br><span class="line">  adl        /home/woolninesun/.<span class="built_in">local</span>/pyenv/versions/3.7.2/envs/jupyterlab/share/jupyter/kernels/ADL</span><br><span class="line">  python3    /home/woolninesun/.<span class="built_in">local</span>/pyenv/versions/3.7.2/envs/jupyterlab/share/jupyter/kernels/python3</span><br><span class="line"></span><br><span class="line">(jupyterlab) $ jupyter lab</span><br><span class="line">...</span><br><span class="line">    To access the notebook, open this file <span class="keyword">in</span> a browser:</span><br><span class="line">        file:///run/user/1001/jupyter/nbserver-22604-open.html</span><br><span class="line">    Or copy and paste one of these URLs:</span><br><span class="line">        http://localhost:12678/?token=047400733cd6ebff70fe9da688d6895c32a3955727bbfa77</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p><img src="/uploads/7a4db81b/0002.png"></p>
+<h2 id="測試是不是真的不同-kernel"><a href="#測試是不是真的不同-kernel" class="headerlink" title="測試是不是真的不同 kernel"></a>測試是不是真的不同 kernel</h2><p><img src="/uploads/7a4db81b/0003.png"><br><img src="/uploads/7a4db81b/0004.png"></p>
+<div class="note warning"><p>1.要注意到 jupyterlab 裡面的 python3 是 pyenv jupyterlab 的 python 3.7.2，不是系統上的 python;</p>
+</div>
+
+
+<h2 id="UPDATE-INFO"><a href="#UPDATE-INFO" class="headerlink" title="UPDATE INFO"></a>UPDATE INFO</h2><h4 id="2019-03-17"><a href="#2019-03-17" class="headerlink" title="2019/03/17"></a>2019/03/17</h4><p>在 ubuntu 上用 pyenv 安裝 python 3.7.2 出現 <code>ModuleNotFoundError: No module named &#39;_ctypes&#39;</code> 錯誤，解決並更新文章。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>WooLNinesun
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://blog.woolninesun.org/posts/7a4db81b/" title="使用 pyenv 建立獨立的 Jupyter kernels！">https://blog.woolninesun.org/posts/7a4db81b/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/python/" rel="tag"># python</a>
+              <a href="/tags/jupyter/" rel="tag"># jupyter</a>
+              <a href="/tags/pyenv/" rel="tag"># pyenv</a>
+              <a href="/tags/virtualenv/" rel="tag"># virtualenv</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/9aeb46bc/" rel="prev" title="EDU-CTF 2018 - TripleSigma">
+      <i class="fa fa-chevron-left"></i> EDU-CTF 2018 - TripleSigma
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+        </div>
+        
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2016 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">WooLNinesun</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

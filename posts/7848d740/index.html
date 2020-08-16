@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.woolninesun.org","root":"/","scheme":"Gemini","version":"8.0.0-rc.5","exturl":false,"sidebar":{"position":"left","display":"hide","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false};
+  </script>
+
+  <meta name="description" content="對於一個喜歡不斷修改文章內容甚至標題的人來說，每次修改都會讓 hexo 產生的文章 url 變化，不利於 SEO 和文章的分享。再來也是因為這是一個中文的 blog ，難免會使用中文當標題，產生的連結就會很長 ( 瀏覽器會幫你轉成中文，但實際上很長 )，所以必須想個避免出現中文和固定 url 的方法！">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在 Hexo 上使用 uuid link">
+<meta property="og:url" content="https://blog.woolninesun.org/posts/7848d740/index.html">
+<meta property="og:site_name" content="奈尚羊毛">
+<meta property="og:description" content="對於一個喜歡不斷修改文章內容甚至標題的人來說，每次修改都會讓 hexo 產生的文章 url 變化，不利於 SEO 和文章的分享。再來也是因為這是一個中文的 blog ，難免會使用中文當標題，產生的連結就會很長 ( 瀏覽器會幫你轉成中文，但實際上很長 )，所以必須想個避免出現中文和固定 url 的方法！">
+<meta property="og:locale">
+<meta property="article:published_time" content="2018-01-20T04:29:14.000Z">
+<meta property="article:modified_time" content="2018-02-12T06:14:00.000Z">
+<meta property="article:author" content="WooLNinesun">
+<meta property="article:tag" content="Hexo">
+<meta property="article:tag" content="Hexo-plugins">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.woolninesun.org/posts/7848d740/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh'
+  };
+</script>
+
+  <title>在 Hexo 上使用 uuid link | 奈尚羊毛</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <main class="main">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+        <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">奈尚羊毛</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">願如同童話裡的山羊般咀嚼知識</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-首頁">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-文章">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>文章</a>
+
+  </li>
+        <li class="menu-item menu-item-分類">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-關於">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a>
+
+  </li>
+        <li class="menu-item menu-item-留言">
+
+    <a href="/comments/" rel="section"><i class="fa fa-comments fa-fw"></i>留言</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <section class="post-toc-wrap sidebar-panel">
+          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%AD%A3%E6%96%87"><span class="nav-number">1.</span> <span class="nav-text">[正文]</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Q1-Permalink-%E6%A0%BC%E5%BC%8F%E4%B8%8D%E5%A5%BD%E5%97%8E%EF%BC%8C%E7%9C%8B%E5%88%B0%E9%8F%88%E7%B5%90%E5%B0%B1%E8%83%BD%E9%A6%AC%E4%B8%8A%E7%9F%A5%E9%81%93%E6%96%87%E7%AB%A0%E6%A8%99%E9%A1%8C%E5%92%8C%E6%99%82%E9%96%93%E5%91%A2%EF%BC%9F"><span class="nav-number">1.0.0.0.1.</span> <span class="nav-text">Q1: Permalink 格式不好嗎，看到鏈結就能馬上知道文章標題和時間呢？</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Q2-%E4%BD%BF%E7%94%A8-hexo-abbrlink-%E9%80%99%E5%80%8B%E6%8F%92%E4%BB%B6%E4%B8%8D%E8%A1%8C%E5%97%8E%EF%BC%9F"><span class="nav-number">1.0.0.0.2.</span> <span class="nav-text">Q2: 使用 hexo-abbrlink 這個插件不行嗎？</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UPDATE-INFO"><span class="nav-number">1.1.</span> <span class="nav-text">UPDATE INFO</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2018-01-23"><span class="nav-number">1.1.0.1.</span> <span class="nav-text">2018&#x2F;01&#x2F;23</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2018-02-12"><span class="nav-number">1.1.0.2.</span> <span class="nav-text">2018&#x2F;02&#x2F;12</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2018-11-23"><span class="nav-number">1.1.0.3.</span> <span class="nav-text">2018&#x2F;11&#x2F;23</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2019-01-25"><span class="nav-number">1.1.0.4.</span> <span class="nav-text">2019&#x2F;01&#x2F;25</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </section>
+      <!--/noindex-->
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="WooLNinesun"
+      src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">WooLNinesun</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/woolninesun" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;woolninesun" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:WooLNinesun+blog@gmail.com" title="E-Mail → mailto:WooLNinesun+blog@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </section>
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </header>
+
+      
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div id="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+      <div class="main-inner">
+        
+
+        <div class="content post posts-expand">
+          
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh">
+    <link itemprop="mainEntityOfPage" href="https://blog.woolninesun.org/posts/7848d740/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="WooLNinesun">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="奈尚羊毛">
+    </span>
+
+    
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          在 Hexo 上使用 uuid link
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-01-20 12:29:14" itemprop="dateCreated datePublished" datetime="2018-01-20T12:29:14+08:00">2018-01-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2018-02-12 14:14:00" itemprop="dateModified" datetime="2018-02-12T14:14:00+08:00">2018-02-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Hexo-%E8%83%A1%E6%94%AA%E7%9E%8E%E6%90%9E/" itemprop="url" rel="index"><span itemprop="name">Hexo 胡攪瞎搞</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>對於一個喜歡不斷修改文章內容甚至標題的人來說，每次修改都會讓 hexo 產生的文章 url 變化，不利於 SEO 和文章的分享。再來也是因為這是一個中文的 blog ，難免會使用中文當標題，產生的連結就會很長 ( 瀏覽器會幫你轉成中文，但實際上很長 )，所以必須想個<strong>避免出現中文</strong>和<strong>固定 url</strong> 的方法！</p>
+<a id="more"></a>
+
+<h1 id="正文"><a href="#正文" class="headerlink" title="[正文]"></a>[正文]</h1><p>咱想到增加一個固定不變的文章屬性當作 permalink 的結構，例如 uuid 或其他需要種子的 md5 , base64，然後把 permalink 格式改為 <code>posts/:uuid/</code> ！</p>
+<p>搜尋了一下馬上就找到 <a target="_blank" rel="noopener" href="https://chekun.me/post/hexo-uuid">hexo-uuid</a> 這個 plugin ( 這個 plugin 的作者自己卻沒使用 Orz )</p>
+<p>進到 hexo blog 的根目錄然後安裝</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-uuid --save</span><br></pre></td></tr></table></figure>
+
+<p>按照說明，他是使用 hexo 新增文章的指令來生成 uuid</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo new xxx // xxx 是文章的標題</span><br></pre></td></tr></table></figure>
+
+<p>然後再 <code>source/_post/xxx.md</code> 會看到上面的 yml 出現 uuid 的屬性。</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">uuid:</span> <span class="string">7848d740-fd9a-11e7-ba72-ab02344a9ad8</span></span><br><span class="line"><span class="attr">title:</span> <span class="string">xxx</span></span><br><span class="line"><span class="string">...</span> <span class="string">other</span></span><br><span class="line"><span class="meta">---</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><code>... other</code> 的地方會依據你 <code>scaffolds/post.md</code> 的定義建構。</p>
+</blockquote>
+<p>完成安裝和建構 uuid 的屬性後接下來就是要設定 hexo 的 <code>_config.yml</code>，修改 permalink 的設定</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># permalink: :year/:month/:day/:title/</span></span><br><span class="line"><span class="attr">permalink:</span> <span class="string">posts/:uuid/</span></span><br></pre></td></tr></table></figure>
+
+<p>這樣就完成了 hexo-uuid 設置瞜，之後文章的 url 就會變成文章中 <code>yml</code> 設定的 <code>uuid</code> 了！</p>
+<hr>
+<p>不過這樣變成每次生成文章都要輸入 <code>hexo new</code> 的指令，對一個習慣直接開 .md 檔寫文章的人來說感覺就是多了一道程序，希望能在未添加 <code>uuid</code> 屬性的文章自動增加再生成靜態檔案！</p>
+<p>既然他是 open source，就直接來修改 code 吧！先把 repo foke 出來修改，因為要在 render 之前先檢查文章中有沒有 uuid 的屬性，所以在 <code>index.js</code> 中和 hexo 註冊 before_post_render 的事件，並傳入需要執行的 function。</p>
+<figure class="highlight js"><figcaption><span>index.js before</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&#x27;use strict&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> HexoUuid = <span class="built_in">require</span>(<span class="string">&#x27;./lib/hexo-uuid&#x27;</span>);</span><br><span class="line"></span><br><span class="line">hexo.on(<span class="string">&#x27;new&#x27;</span>, HexoUuid);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight js"><figcaption><span>index.js after</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&#x27;use strict&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> HexoUuid = <span class="built_in">require</span>(<span class="string">&#x27;./lib/hexo-uuid&#x27;</span>);</span><br><span class="line"></span><br><span class="line">hexo.on(<span class="string">&#x27;new&#x27;</span>, HexoUuid.newPost);</span><br><span class="line">hexo.extend.filter.register(<span class="string">&#x27;before_post_render&#x27;</span>, HexoUuid.before_renderPost);</span><br></pre></td></tr></table></figure>
+
+<p>然後再 <code>hexo_uuid.js</code> 新增 HexoUuid.before_renderPost 的本體！</p>
+<figure class="highlight js"><figcaption><span>hexo-uuid.js before</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&#x27;use strict&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> uuid = <span class="built_in">require</span>(<span class="string">&#x27;uuid&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = <span class="function">(<span class="params">post</span>) =&gt;</span> &#123;</span><br><span class="line">  ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight js"><figcaption><span>hexo-uuid.js after</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&#x27;use strict&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> uuid = <span class="built_in">require</span>(<span class="string">&#x27;uuid&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports.newPost = <span class="function">(<span class="params">post</span>) =&gt;</span> &#123;</span><br><span class="line">  ...</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports.before_renderPost = <span class="function">(<span class="params">post</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (post.layout == <span class="string">&#x27;post&#x27;</span> &amp;&amp; (!post.uuid || post.uuid == <span class="string">&#x27;&#x27;</span>)) &#123;</span><br><span class="line">    <span class="keyword">let</span> lines = post.raw.split(<span class="string">&#x27;\n&#x27;</span>);</span><br><span class="line">    <span class="keyword">let</span> index = lines.findIndex(<span class="function"><span class="params">item</span> =&gt;</span> item === <span class="string">&#x27;uuid:&#x27;</span>);</span><br><span class="line">    post.uuid = uuid.v1();</span><br><span class="line">    <span class="keyword">if</span> (index &gt; <span class="number">-1</span>) &#123;</span><br><span class="line">      lines[index] += (<span class="string">&#x27; &#x27;</span> + post.uuid);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      lines.splice(<span class="number">1</span>, <span class="number">0</span>, <span class="string">&#x27;uuid: &#x27;</span> + post.uuid);</span><br><span class="line">    &#125;</span><br><span class="line">    post.raw = lines.join(<span class="string">&#x27;\n&#x27;</span>);</span><br><span class="line">    fs.writeFile(post.full_source, post.raw);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>這樣就完成了！之後文章中沒有 uuid 屬性的話，就會直接在文章中增加 uuid 屬性，就不用特地打 hexo new xxx 才能開始寫文章了。</p>
+<hr>
+<h5 id="Q1-Permalink-格式不好嗎，看到鏈結就能馬上知道文章標題和時間呢？"><a href="#Q1-Permalink-格式不好嗎，看到鏈結就能馬上知道文章標題和時間呢？" class="headerlink" title="Q1: Permalink 格式不好嗎，看到鏈結就能馬上知道文章標題和時間呢？"></a>Q1: <a target="_blank" rel="noopener" href="https://hexo.io/zh-tw/docs/permalinks.html">Permalink</a> 格式不好嗎，看到鏈結就能馬上知道文章標題和時間呢？</h5><p>咱認為這樣的設置比較適合一但<strong>發佈/公開文章就不會再修改的網站</strong>，對咱來說就非常不適合了，咱發布文章後偶而會在回去看以前的文章，一旦腦袋閃過更好的內文描述方式就會去修改(對標題也一樣)。但修改標題後 url 也會發生變化，等同於<strong>以前的分享都會失效</strong>。也許會有人問其他格式的 permalink 呢？咱想只要是 hexo 預設的都不太適合，都不能保證不會改變。</p>
+<h5 id="Q2-使用-hexo-abbrlink-這個插件不行嗎？"><a href="#Q2-使用-hexo-abbrlink-這個插件不行嗎？" class="headerlink" title="Q2: 使用 hexo-abbrlink 這個插件不行嗎？"></a>Q2: 使用 <a target="_blank" rel="noopener" href="https://post.zz173.com/detail/hexo-abbrlink.html">hexo-abbrlink</a> 這個插件不行嗎？</h5><p>老實說咱有心動一下，但是基於之前在 wordpress 的文章是使用 uuid 當 post_id，為了移轉的方便性，就不使用這個 plugin 了，雖然方便性比咱要使用的 hexo-uuid 方便，但既然是 open source 的，那就修改過就好！</p>
+<hr>
+<h2 id="UPDATE-INFO"><a href="#UPDATE-INFO" class="headerlink" title="UPDATE INFO"></a>UPDATE INFO</h2><h4 id="2018-01-23"><a href="#2018-01-23" class="headerlink" title="2018/01/23"></a>2018/01/23</h4><p>發給 uuid 原作者的 PR ( pull request ) 被接受了，所以原本的 uuid 插件現在也有這份 code 搂</p>
+<h4 id="2018-02-12"><a href="#2018-02-12" class="headerlink" title="2018/02/12"></a>2018/02/12</h4><p>發現在 hexo server 的狀態下修改文章，文章如果是空白的會讓它不斷地增加 uuid，於是修正了判斷式</p>
+<figure class="highlight js"><figcaption><span>hexo-uuid.js defore</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports.before_renderPost = <span class="function">(<span class="params">post</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (post.layout == <span class="string">&#x27;post&#x27;</span> &amp;&amp; (!post.uuid || post.uuid == <span class="string">&#x27;&#x27;</span>)) &#123;</span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight js"><figcaption><span>hexo-uuid.js after</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports.before_renderPost = <span class="function">(<span class="params">post</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (</span><br><span class="line">    post.layout == <span class="string">&#x27;post&#x27;</span> &amp;&amp;</span><br><span class="line">    post.title != <span class="string">&#x27;&#x27;</span> &amp;&amp;</span><br><span class="line">    (!post.uuid || post.uuid == <span class="string">&#x27;&#x27;</span>)</span><br><span class="line">  ) &#123;</span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="2018-11-23"><a href="#2018-11-23" class="headerlink" title="2018/11/23"></a>2018/11/23</h4><p>為了統一我 blog 上所有 hexo 插件的名字，把 hexo-uuid 改名成 hexo-plugin-uuid。</p>
+<h4 id="2019-01-25"><a href="#2019-01-25" class="headerlink" title="2019/01/25"></a>2019/01/25</h4><p>用到後面覺得自己在文章新增 uuid 的屬性比較快，於是就把 hexo-plugin-uuid 從我的 project 中移除了，如果想使用的話，原作者的 hexo-uuid 還可以使用噢</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>WooLNinesun
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://blog.woolninesun.org/posts/7848d740/" title="在 Hexo 上使用 uuid link">https://blog.woolninesun.org/posts/7848d740/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Hexo/" rel="tag"># Hexo</a>
+              <a href="/tags/Hexo-plugins/" rel="tag"># Hexo-plugins</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/3e7c0160/" rel="prev" title="在 Git-bash for windows 新增命令">
+      <i class="fa fa-chevron-left"></i> 在 Git-bash for windows 新增命令
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/51e7c290/" rel="next" title="開發 Telegram Bot 的筆記雜談">
+      開發 Telegram Bot 的筆記雜談 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+        </div>
+        
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2016 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">WooLNinesun</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

