@@ -2769,3 +2769,7 @@ ul.breadcrumb li + li:last-child {
 .highlight .line.marked {
   background-color: #add8e6;
 }
+.video-container,
+.post-body .video-container {
+  padding-top: 60%;
+}
