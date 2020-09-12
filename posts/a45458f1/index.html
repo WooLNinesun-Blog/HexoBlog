@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.0.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.woolninesun.org","root":"/","scheme":"Gemini","version":"8.0.0-rc.5","exturl":false,"sidebar":{"position":"left","display":"hide","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false};
+  </script>
+
+  <meta name="description" content="透過簡單的情境和 typescript 的 code 去理解 Dependency Inversion Principle 的有趣之處">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dependency Inversion Principle">
+<meta property="og:url" content="https://blog.woolninesun.org/posts/a45458f1/index.html">
+<meta property="og:site_name" content="奈尚羊毛">
+<meta property="og:description" content="透過簡單的情境和 typescript 的 code 去理解 Dependency Inversion Principle 的有趣之處">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-09-11T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-09-11T16:00:00.000Z">
+<meta property="article:author" content="WooLNinesun">
+<meta property="article:tag" content="leetcode">
+<meta property="article:tag" content="algorithms">
+<meta property="article:tag" content="javascript">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.woolninesun.org/posts/a45458f1/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh'
+  };
+</script>
+
+  <title>Dependency Inversion Principle | 奈尚羊毛</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <main class="main">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+        <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">奈尚羊毛</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">願如同童話裡的山羊般咀嚼知識</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-首頁">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-文章">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>文章</a>
+
+  </li>
+        <li class="menu-item menu-item-分類">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-關於">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>關於</a>
+
+  </li>
+        <li class="menu-item menu-item-留言">
+
+    <a href="/comments/" rel="section"><i class="fa fa-comments fa-fw"></i>留言</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <section class="post-toc-wrap sidebar-panel">
+          <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%AD%A3%E6%96%87"><span class="nav-number">1.</span> <span class="nav-text">[正文]</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#0x00-%E5%AE%9A%E7%BE%A9%EF%BC%9F"><span class="nav-number">1.1.</span> <span class="nav-text">0x00 定義？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x01-%E5%95%8F%E9%A1%8C"><span class="nav-number">1.2.</span> <span class="nav-text">0x01 問題</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Dependency-Injection"><span class="nav-number">1.2.1.</span> <span class="nav-text">Dependency Injection</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0x02-%E5%AE%9A%E7%BE%A9%EF%BC%81"><span class="nav-number">1.3.</span> <span class="nav-text">0x02 定義！</span></a></li></ol></li></ol></div>
+      </section>
+      <!--/noindex-->
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="WooLNinesun"
+      src="/uploads/avatar.png">
+  <p class="site-author-name" itemprop="name">WooLNinesun</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/woolninesun" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;woolninesun" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:WooLNinesun+blog@gmail.com" title="E-Mail → mailto:WooLNinesun+blog@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </section>
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </header>
+
+      
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div id="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+      <div class="main-inner">
+        
+
+        <div class="content post posts-expand">
+          
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh">
+    <link itemprop="mainEntityOfPage" href="https://blog.woolninesun.org/posts/a45458f1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/avatar.png">
+      <meta itemprop="name" content="WooLNinesun">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="奈尚羊毛">
+    </span>
+
+    
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Dependency Inversion Principle
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-09-12 00:00:00" itemprop="dateCreated datePublished" datetime="2020-09-12T00:00:00+08:00">2020-09-12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Design-Patterns/" itemprop="url" rel="index"><span itemprop="name">Design Patterns</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>透過簡單的情境和 typescript 的 code 去理解 Dependency Inversion Principle 的有趣之處</p>
+<a id="more"></a>
+
+<h1 id="正文"><a href="#正文" class="headerlink" title="[正文]"></a>[正文]</h1><h2 id="0x00-定義？"><a href="#0x00-定義？" class="headerlink" title="0x00 定義？"></a>0x00 定義？</h2><p>直接來看 Dependency Inversion Principle (DIP) 的定義</p>
+<ol>
+<li>High-level modules should not depend on low-level modules. Both should depend on abstractions.</li>
+<li>Abstractions should not depend on details. Details should depend on abstractions.</li>
+</ol>
+<p>看完之後就先放到一旁不管，等到我們理解後再回來看看兩條定義。</p>
+<h2 id="0x01-問題"><a href="#0x01-問題" class="headerlink" title="0x01 問題"></a>0x01 問題</h2><p>我們先來弄明白兩件事情：</p>
+<ol>
+<li>什麼是 high/low level modules？</li>
+<li>要怎麼知道哪個東西 depend on 哪個東西？</li>
+</ol>
+<p>答案非常簡單，就是看誰使用誰就好，例如以下的 code 可以從第 11 行看出 Programmer 會使用 Computer 的 program method</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> Computer &#123;</span><br><span class="line">  program() &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&quot;Computer: Code...Code...Code...&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> Programmer &#123;</span><br><span class="line">  <span class="keyword">private</span> computer = <span class="keyword">new</span> Computer();</span><br><span class="line"></span><br><span class="line">  code(): <span class="built_in">void</span> &#123;</span><br><span class="line marked">    <span class="built_in">this</span>.computer.program();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> Company &#123;</span><br><span class="line">  main() &#123;</span><br><span class="line">    <span class="keyword">const</span> me = <span class="keyword">new</span> Programmer();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(<span class="literal">true</span>) &#123; me.code(); &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>咱們就可以說：</p>
+<ol>
+<li>Programmer depend on Computer<ul>
+<li>沒有 Computer，就沒辦法寫 code！</li>
+</ul>
+</li>
+<li>Programmer is high-level modules</li>
+<li>Computer is low-level modules</li>
+</ol>
+<p>不過剛剛那段 Code 有個問題，就是因為電腦是程式設計師帶來的，如果今天電腦壞掉的話就要連程式設計師一起換掉，這相當不合理，所以公司決定配發電腦給程式設計師用！這樣電腦壞掉的話，就換一個給程式設計師就好</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> Programmer &#123;</span><br><span class="line">  <span class="keyword">private</span> computer: Computer;</span><br><span class="line"></span><br><span class="line marked">  <span class="keyword">constructor</span>(<span class="params">computer: Computer</span>) &#123;</span><br><span class="line marked">    <span class="built_in">this</span>.setComputer(computer);</span><br><span class="line marked">  &#125;</span><br><span class="line"></span><br><span class="line">  setComputer(computer: Computer) &#123;</span><br><span class="line">    <span class="built_in">this</span>.computer = computer;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  code(): <span class="built_in">void</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.computer.program();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> Company &#123;</span><br><span class="line">  main() &#123;</span><br><span class="line marked">    <span class="keyword">const</span> me = <span class="keyword">new</span> Programmer(<span class="keyword">new</span> Computer());</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(<span class="literal">true</span>) &#123; me.code(); &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<div class="note info"><h3 id="Dependency-Injection"><a href="#Dependency-Injection" class="headerlink" title="Dependency Injection"></a>Dependency Injection</h3><p>像這樣把 Dependency 建立的責任交給上一層使用自己的物件來建立然後在傳給自己，就叫做 <code>Dependency Injection</code></p>
+<p>例如上一段 Code 的 25 行，Programmer 將它的 Dependency(Computer) 交給 Company 來建立然後傳給自已</p>
+</div>
+
+<p>如果今天公司請了另一個程式設計師，因為他會需要用筆電來工作，程式碼就要新增 LaptopProgrammer：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> Laptop &#123;</span><br><span class="line">  program() &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&quot;Laptop: Code...Code...Code...&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> LaptopProgrammer &#123;</span><br><span class="line">  <span class="keyword">private</span> laptop: Laptop;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">constructor</span>(<span class="params">laptop: Laptop</span>) &#123;</span><br><span class="line">    <span class="built_in">this</span>.setLaptop(laptop);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  setLaptop(laptop: Laptop) &#123;</span><br><span class="line">    <span class="built_in">this</span>.laptop = laptop;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  code(): <span class="built_in">void</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.laptop.program();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> Company &#123;</span><br><span class="line">  main() &#123;</span><br><span class="line">    <span class="keyword">const</span> me = <span class="keyword">new</span> Programmer(<span class="keyword">new</span> Computer());</span><br><span class="line">    <span class="keyword">const</span> colleague = <span class="keyword">new</span> LaptopProgrammer(<span class="keyword">new</span> Laptop());</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(<span class="literal">true</span>) &#123; </span><br><span class="line">      me.code(); </span><br><span class="line">      colleague.code();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>這樣每多一種可以 <code>program</code> 的工具，就要新增一個相似的 class，相當不合理，所以我們可以抽象化 Computer 和 Laptop</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line marked"><span class="keyword">interface</span> Programable &#123;</span><br><span class="line marked">  program(): <span class="built_in">void</span>;</span><br><span class="line marked">&#125;</span><br><span class="line"></span><br><span class="line marked"><span class="keyword">class</span> Computer <span class="keyword">implements</span> Programable &#123;</span><br><span class="line">  program() &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&quot;Computer: Code...Code...Code...&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line marked"><span class="keyword">class</span> Laptop <span class="keyword">implements</span> Programable &#123;</span><br><span class="line">  program() &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&quot;Laptop: Code...Code...Code...&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> Programmer &#123;</span><br><span class="line">  <span class="keyword">private</span> programableTool: Programable;</span><br><span class="line"></span><br><span class="line marked">  <span class="keyword">constructor</span>(<span class="params">programableTool: Programable</span>) &#123;</span><br><span class="line">    <span class="built_in">this</span>.setProgramableTool(programableTool);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  setProgramableTool(programableTool: Programable) &#123;</span><br><span class="line">    <span class="built_in">this</span>.programableTool = programableTool;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  code(): <span class="built_in">void</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.programableTool.program();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> Company &#123;</span><br><span class="line">  main() &#123;</span><br><span class="line">    <span class="keyword">const</span> me = <span class="keyword">new</span> Programmer(<span class="keyword">new</span> Computer());</span><br><span class="line marked">    <span class="keyword">const</span> colleague = <span class="keyword">new</span> Programmer(<span class="keyword">new</span> Laptop());</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(<span class="literal">true</span>) &#123;</span><br><span class="line">      me.code();</span><br><span class="line">      colleague.code();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>這樣之後不管程式設計師想要用什麼來寫 code，只要工具是 Programable，公司都能新增給他！例如：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> SmartPhone <span class="keyword">implements</span> Programable &#123;</span><br><span class="line">  program() &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&quot;SmartPhone: Code...Code...Code...&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> Company &#123;</span><br><span class="line">  main() &#123;</span><br><span class="line">    <span class="keyword">const</span> me = <span class="keyword">new</span> Programmer(<span class="keyword">new</span> SmartPhone());</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(<span class="literal">true</span>) &#123;</span><br><span class="line">      colleague.code();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x02-定義！"><a href="#0x02-定義！" class="headerlink" title="0x02 定義！"></a>0x02 定義！</h2><p>我們現在在看一次那兩點定義，你會發現你看懂了，還變成你熟悉的語言嘍</p>
+<ol>
+<li>高層次的模組（Programmer）不應該依賴於低層次的模組（Computer），兩者都應該依賴於抽象介面(Programable)。</li>
+<li>抽象介面(Programable)不應該依賴於具體實現(Computer)。而具體實現(Computer)則應該依賴於抽象介面(Programable)。</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>WooLNinesun
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="https://blog.woolninesun.org/posts/a45458f1/" title="Dependency Inversion Principle">https://blog.woolninesun.org/posts/a45458f1/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/leetcode/" rel="tag"># leetcode</a>
+              <a href="/tags/algorithms/" rel="tag"># algorithms</a>
+              <a href="/tags/javascript/" rel="tag"># javascript</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/7a4db81b/" rel="prev" title="使用 pyenv 建立獨立的 Jupyter kernels！">
+      <i class="fa fa-chevron-left"></i> 使用 pyenv 建立獨立的 Jupyter kernels！
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+        </div>
+        
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2016 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">WooLNinesun</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
