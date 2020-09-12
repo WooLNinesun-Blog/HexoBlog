@@ -323,9 +323,11 @@
 
 <h2 id="0x02-定義！"><a href="#0x02-定義！" class="headerlink" title="0x02 定義！"></a>0x02 定義！</h2><p>我們現在在看一次那兩點定義，你會發現你看懂了，還變成你熟悉的語言嘍</p>
 <ol>
-<li>高層次的模組（Programmer）不應該依賴於低層次的模組（Computer），兩者都應該依賴於抽象介面(Programable)。</li>
+<li>高層次的模組(Programmer)不應該依賴於低層次的模組(Computer)，兩者都應該依賴於抽象介面(Programable)。</li>
 <li>抽象介面(Programable)不應該依賴於具體實現(Computer)。而具體實現(Computer)則應該依賴於抽象介面(Programable)。</li>
 </ol>
+<p>一開始 Programmer 依賴 Computer，在修改 Computer 的時後所有用到 Computer 的地方都需要顧慮會不會需要修改，要將 Computer 換掉還要修改 Programmer。</p>
+<p>經過一番修改之後，Programmer 改成依賴 Programable，而 Computer 也依賴(實做) Programable，這樣我們就可以自由的新增各種 Programable 的工具或修改工具，而不影響到 Programmer 這個 high level 的 module。</p>
 
     </div>
 
